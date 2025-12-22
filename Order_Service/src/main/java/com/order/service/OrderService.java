@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.order.dto.UserDto;
 import com.order.entity.Order;
 import com.order.exception.OrderException;
 import com.order.repo.IOrderRepo;
@@ -19,10 +21,21 @@ public class OrderService {
 	@Autowired
 	private IOrderRepo orderRepo;
 	
+	@Autowired
+	private RestTemplate restTemplate;
+	
 	public Order createOrder(Order order) {
 		log.info("Order is placed for UserId: "+order.getUserId());
 		
 		try {
+			
+			UserDto user = restTemplate.getForObject("http://localhost:9000/get-user/{id}",UserDto.class, order.getUserId());
+			
+			if(user==null) {
+				log.error("User with Id: "+order.getUserId()+" does not exists...");
+				throw new OrderException("User with Id: "+order.getUserId()+" does not exists...");
+			}
+			
 			order.setStatus("Placed");
 			Order savedOrder=orderRepo.save(order);
 			log.debug("Order created successfully for User: "+order.getUserId());
