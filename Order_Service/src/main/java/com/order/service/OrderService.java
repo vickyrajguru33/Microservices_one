@@ -32,7 +32,11 @@ public class OrderService {
 		try {
 			
 			// without Eureka and API Gateway
-			UserDto user = restTemplate.getForObject("http://localhost:9000/get-user/{id}",UserDto.class, order.getUserId());
+			 UserDto user = restTemplate.getForObject("http://localhost:9000/get-user/{id}",UserDto.class, order.getUserId());
+			
+			// with eureka
+//			UserDto user = restTemplate.getForObject("User_Serivice/", null)
+			
 			
 			if(user==null) {
 				log.error("User with Id: "+order.getUserId()+" does not exists...");
