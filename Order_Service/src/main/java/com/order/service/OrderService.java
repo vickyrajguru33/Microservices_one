@@ -36,7 +36,7 @@ public class OrderService {
 			
 			// with eureka
 			UserDto user = restTemplate.getForObject(
-				    "http://USER-SERVICE/get-user/{id}",
+				    "http://USER-SERVICE/users/get-user/{id}",
 				    UserDto.class,
 				    order.getUserId()
 				);
