@@ -31,6 +31,7 @@ public class OrderService {
 		
 		try {
 			
+			// without Eureka and API Gateway
 			UserDto user = restTemplate.getForObject("http://localhost:9000/get-user/{id}",UserDto.class, order.getUserId());
 			
 			if(user==null) {
