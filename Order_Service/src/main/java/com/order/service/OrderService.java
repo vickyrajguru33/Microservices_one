@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.order.dto.UserDto;
@@ -29,7 +31,16 @@ public class OrderService {
 		
 		try {
 			
-			UserDto user = restTemplate.getForObject("http://localhost:9000/get-user/{id}",UserDto.class, order.getUserId());
+			// without Eureka and API Gateway
+//			 UserDto user = restTemplate.getForObject("http://localhost:9000/get-user/{id}",UserDto.class, order.getUserId());
+			
+			// with eureka
+			UserDto user = restTemplate.getForObject(
+				    "http://USER-SERVICE/users/get-user/{id}",
+				    UserDto.class,
+				    order.getUserId()
+				);
+			
 			
 			if(user==null) {
 				log.error("User with Id: "+order.getUserId()+" does not exists...");
@@ -41,6 +52,13 @@ public class OrderService {
 			log.debug("Order created successfully for User: "+order.getUserId());
 			return savedOrder;
 			
+			// first two exception handle using gloabal exception handler
+		}catch (HttpClientErrorException e) {
+			log.error("User is not found with Id: "+order.getUserId(), e);
+			throw new OrderException("User is not found...!");
+		}catch (ResourceAccessException e) {
+			log.error("User service is down..",e);
+			throw new OrderException("user service is down exception..!");
 		}catch (Exception e) {
 			log.error("Failed to Placed order for user id: "+order.getUserId());
 			throw new OrderException("Failed to create Order for User id: "+order.getUserId(),e);
