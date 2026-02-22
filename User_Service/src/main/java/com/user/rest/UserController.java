@@ -20,9 +20,13 @@ public class UserController {
 	
 	public static final Logger log = LoggerFactory.getLogger(UserController.class);
 	
-	@Autowired
+	
 	private UserService userService;
 	
+	public  UserController(UserService userService) {
+		this.userService = userService;
+		
+	}
 	
 	
 	@PostMapping("/add-user")
